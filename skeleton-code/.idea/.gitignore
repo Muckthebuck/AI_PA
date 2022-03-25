@@ -1,4 +1,6 @@
 # Default ignored files
+/shelf/
+/workspace.xml
 # Datasource local storage ignored files
 /../../../../../../../../../../:\Users\mukul\Desktop\Semester_1\AI\project_A\AI_PA\skeleton-code\.idea/dataSources/
 /dataSources.local.xml

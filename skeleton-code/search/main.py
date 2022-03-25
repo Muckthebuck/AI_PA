@@ -71,8 +71,23 @@ class PriorityQueue:
     def empty(self) -> bool:
         return not self.elements
 
-    def put(self, item: T, priority: float):
-        heapq.heappush(self.elements, (priority, item))
+    def min_heapify(self, key):
+        left = 2 * key
+        right = (2 * key) + 1
+        if not left >= len(self.elements):
+            node = self.elements[key]
+            if node[0] > (self.elements[left])[0] or node[0] > self.elements[right]:
+                if (self.elements[right])[0] > (self.elements[left])[0]:
+                    self.elements[key], self.elements[left] = self.elements[left], self.elements[key]
+                    self.min_heapify(left)
+                else:
+                    self.elements[key], self.elements[right] = self.elements[right], self.elements[key]
+                    self.min_heapify(right)
+
+    def push(self, item: T, priority: float):
+        self.elements.append((priority, item))
+        if len(self.elements) - 1 > 0:
+            self.min_heapify(len(self.elements) - 1)
 
     def get(self) -> T:
         return heapq.heappop(self.elements)[1]
@@ -80,6 +95,9 @@ class PriorityQueue:
 
 def reconstruct_path(came_from: Dict[Location, Location],
                      start: Location, goal: Location) -> List[Location]:
+    """
+        adapted from https://www.redblobgames.com/pathfinding/a-star/implementation.html
+    """
     current: Location = goal
     path: List[Location] = []
     while current != start:  # note: this will fail if no path found
@@ -108,14 +126,17 @@ def find_dist(H1, H2):
     r = H1[0] - H2[0]
     q = H1[1] - H2[1]
     s = -r - q
-    d = (abs(r) + abs(q) + abs(s))/2
+    d = (abs(r) + abs(q) + abs(s)) / 2
 
     return d
 
 
 def a_star_search(graph: Graph, start: Location, goal: Location):
+    """
+        adapted from https://www.redblobgames.com/pathfinding/a-star/implementation.html
+    """
     frontier = PriorityQueue()
-    frontier.put(start, 0)
+    frontier.push(start, 0)
     came_from: Dict[Location, Optional[Location]] = {}
     cost_so_far: Dict[Location, float] = {}
     came_from[start] = None
@@ -128,11 +149,11 @@ def a_star_search(graph: Graph, start: Location, goal: Location):
             break
 
         for next in graph.neighbors(current):
-            new_cost = cost_so_far[current] + 1 #+1 for cost to next node
+            new_cost = cost_so_far[current] + 1  # +1 for cost to next node
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
                 priority = new_cost + find_dist(next, goal)
-                frontier.put(next, priority)
+                frontier.push(next, priority)
                 came_from[next] = current
 
     return came_from, cost_so_far
