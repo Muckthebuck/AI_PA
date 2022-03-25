@@ -71,12 +71,19 @@ class PriorityQueue:
     def empty(self) -> bool:
         return not self.elements
 
+    def getParent(self, key) -> int:
+        if key <= 2:
+            return 0
+        else:
+            return (key - 1) // 2
+
     def min_heapify(self, key):
-        left = 2 * key
-        right = (2 * key) + 1
-        if not left >= len(self.elements):
+        # not used rn
+        left = (2 * key) + 1
+        right = (2 * key) + 2
+        if not right >= len(self.elements):
             node = self.elements[key]
-            if node[0] > (self.elements[left])[0] or node[0] > self.elements[right]:
+            if node[0] > (self.elements[left])[0] or node[0] > self.elements[right][0]:
                 if (self.elements[right])[0] > (self.elements[left])[0]:
                     self.elements[key], self.elements[left] = self.elements[left], self.elements[key]
                     self.min_heapify(left)
@@ -86,11 +93,20 @@ class PriorityQueue:
 
     def push(self, item: T, priority: float):
         self.elements.append((priority, item))
-        if len(self.elements) - 1 > 0:
-            self.min_heapify(len(self.elements) - 1)
+        curr = len(self.elements) - 1
+        while self.elements[curr][0] < self.elements[self.getParent(curr)][0]:
+            self.elements[curr], self.elements[self.getParent(curr)] = self.elements[self.getParent(curr)], \
+                                                                       self.elements[curr]
+            curr = self.getParent(curr)
 
-    def get(self) -> T:
-        return heapq.heappop(self.elements)[1]
+    def pop(self) -> T:
+        head = self.elements[0]
+        self.elements[0] = self.elements[-1]
+        self.elements.pop()
+        if len(self.elements) - 1 > 0:
+            self.min_heapify(0)
+        return head[1]
+        # return heapq.heappop(self.elements)[1]
 
 
 def reconstruct_path(came_from: Dict[Location, Location],
@@ -141,11 +157,13 @@ def a_star_search(graph: Graph, start: Location, goal: Location):
     cost_so_far: Dict[Location, float] = {}
     came_from[start] = None
     cost_so_far[start] = 0
+    reached_goal = False
 
     while not frontier.empty():
-        current: Location = frontier.get()
+        current: Location = frontier.pop()
 
         if current == goal:
+            reached_goal = True
             break
 
         for next in graph.neighbors(current):
@@ -156,7 +174,7 @@ def a_star_search(graph: Graph, start: Location, goal: Location):
                 frontier.push(next, priority)
                 came_from[next] = current
 
-    return came_from, cost_so_far
+    return reached_goal, came_from, cost_so_far
 
 
 def main():
@@ -168,11 +186,9 @@ def main():
         sys.exit(1)
 
     # TODO:
-    # Find and print a solution to the board configuration described
-    # by `data`.
-    # Why not start by trying to print this configuration out using the
-    # `print_board` helper function? (See the `util.py` source code for
-    # usage information).
+    # test over different cases
+    # implement bi-directional search
+
     def list_to_dict(lst):
         dic = {}
         for i in lst:
@@ -186,5 +202,11 @@ def main():
     print_board(n, board_dict, "", False)
     board_graph = Graph(n, board_dict)
     board_graph.print()
-    (came_from, cost_so_far) = a_star_search(board_graph, start, goal)
-    print(reconstruct_path(came_from, start, goal))
+    (reached_goal, came_from, cost_so_far) = a_star_search(board_graph, start, goal)
+    print()
+    if reached_goal:
+        path = reconstruct_path(came_from, start, goal)
+        print(len(path))
+        print(path)
+    else:
+        print("NO PATH FOUND")
