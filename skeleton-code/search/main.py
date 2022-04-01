@@ -199,14 +199,15 @@ def main():
     board_dict = list_to_dict(data['board'])
     start = tuple(data['start'])
     goal = tuple(data['goal'])
-    print_board(n, board_dict, "", False)
+    # print_board(n, board_dict, "", False)
     board_graph = Graph(n, board_dict)
-    board_graph.print()
+    # board_graph.print()
     (reached_goal, came_from, cost_so_far) = a_star_search(board_graph, start, goal)
-    print()
+    # print()
     if reached_goal:
         path = reconstruct_path(came_from, start, goal)
         print(len(path))
-        print(path)
+        for i in path:
+            print("("+str(i[0])+","+str(i[1])+")")
     else:
         print("NO PATH FOUND")
