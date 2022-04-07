@@ -14,16 +14,6 @@ import heapq
 from search.util import print_board
 from typing import Dict, List, Tuple, TypeVar, Optional
 
-# class Graph:
-#     """
-#     adapted from https://www.redblobgames.com/pathfinding/a-star/implementation.html
-#     """
-#     def __init__(self):
-# def heuristic(a: GridLocation, b: GridLocation) -> float:
-#     (x1, y1) = a
-#     (x2, y2) = b
-#     return abs(x1 - x2) + abs(y1 - y2)
-
 T = TypeVar('T')
 Location = TypeVar('Location')
 
@@ -203,7 +193,7 @@ def main():
     board_graph = Graph(n, board_dict)
     # board_graph.print()
     (reached_goal, came_from, cost_so_far) = a_star_search(board_graph, start, goal)
-    # print()
+
     if reached_goal:
         path = reconstruct_path(came_from, start, goal)
         print(len(path))
